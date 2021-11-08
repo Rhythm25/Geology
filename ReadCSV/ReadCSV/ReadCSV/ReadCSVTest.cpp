@@ -7,20 +7,16 @@
 
 int main()
 {
-    map<string, vector<string>> allStringsPos;
     string fileName = "hole_dhd_collar.csv";//stores all information about xy positions
+    vector<vector<string>> allStringPos=ReadCSV::ReadFile(fileName);
+    fileName = "hole_dhd_geology.csv";
+    vector<vector<string>> allStringGeo = ReadCSV::ReadFile(fileName);
+    fileName = "hole_dhd_survey.csv";
+    vector<vector<string>> allStringAngle = ReadCSV::ReadFile(fileName);
 
-    ReadCSV::ReadFile(fileName, allStringsPos);
+    vector<double> x, y, z;
+    ReadCSV::FindXYZForSeam(allStringGeo, allStringPos, allStringAngle, 6, x, y, z);
 
-    vector<double> eastValue = ReadCSV::ConvertToDouble(allStringsPos["east"]);
-    vector<double> northValue= ReadCSV::ConvertToDouble(allStringsPos["north"]);
-
-    fileName = "hole_dhd_assay.csv";
-    map<string, vector<string>> allStringsFromTo;
-    ReadCSV::ReadFile(fileName, allStringsFromTo);
-
-    vector<string> dhidValue = allStringsFromTo["dhid"];
-    
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
