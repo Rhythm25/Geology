@@ -83,8 +83,24 @@ void ReadCSV::FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector
 			}
 		}
 	}
+	//Now we have x,y and distances for seam, we need to convert distance to height z
+	//At first, we convert vector<vector> to map<vector> for allStringAngle
+	map<string, vector<vector<string>>> allMapAngle= ConvertToMap(allStringAngle);
+
+	//Then we calculate height
+
+
 
 	//for (int i = 0; i < dhidHasSeam.size(); i++) cout << dhidHasSeam[i] << endl;
+}
+
+int ReadCSV::FindStringPos(vector<string>& vecString, string keyWord) {
+	for (int i = 0; i < vecString.size(); i++) {
+		if (vecString[i].compare(keyWord) == 0) return i;
+	}
+
+	cout << "Error: Cannot find " + keyWord + " keyword!" << endl;
+	return -1;
 }
 
 int ReadCSV::FindStringPos(vector<vector<string>>& allStringGeo, string keyWord) {
@@ -96,13 +112,80 @@ int ReadCSV::FindStringPos(vector<vector<string>>& allStringGeo, string keyWord)
 	return -1;
 }
 
-vector<double> ReadCSV::LengthConvertToHeight(vector<double>& distance, vector<string>& dhid, vector<vector<string>>& allStringAngle) {
-	
+map<string, vector<vector<string>>> ReadCSV::ConvertToMap(vector<vector<string>>& allStrings) {
+	map<string, vector<vector<string>>> stringToMap;
+
+	for (int i = 0; i < allStrings.size(); i++) {
+		vector<string> oneLine=allStrings[i];
+		vector<string> oneLineMap;
+
+		for (int j = 1; j < oneLine.size(); j++) {
+			oneLineMap.push_back(oneLine[j]);
+		}
+		stringToMap[oneLine[0]].push_back(oneLineMap);
+	}
+
+	return stringToMap;
 }
 
-map<string, vector<string>> ConvertToMap(vector<vector<string>>& allStrings) {
-	for (int i = 0; i < allStrings.size(); i++) {
-		vector<string> oneLine;
+vec3 ReadCSV::CalPosForOneDhid(string dhid, double distance, double xSurface, double ySurface, double zSurface,
+	map<string, vector<vector<string>>> &mapAngle) {
+	vec3 posSurface(xSurface, ySurface, zSurface);
+	vec3 pos = posSurface;
+
+	vector<string> keyWord = mapAngle["dhid"][0];
+	int depthNum = FindStringPos(keyWord, "depth");
+	int azimthNum = FindStringPos(keyWord, "azimth");
+	int dipNum = FindStringPos(keyWord, "dip");
+	//vector<double> depthString, azimthString, dipString;
+
+	double height = 0.0,disTmp=distance;
+
+	for (int i = 0; i < mapAngle[dhid].size(); i++) {
+		vector<string> oneLine = mapAngle[dhid][i];
+
+		double depth=atof(oneLine[depthNum].c_str());
+		double azimth=atof(oneLine[azimthNum].c_str());
+		double dip=atof(oneLine[dipNum].c_str());
+
+		if (i + 1 < mapAngle[dhid].size()) {
+			double sectionLength = atof(mapAngle[dhid][i + 1][depthNum].c_str())-depth;
+			if (sectionLength < disTmp) {
+				vec3 sectionVec(sectionLength*cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
+					sectionLength * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
+					sectionLength * sin(1.5 * PI - dip / 180 * PI));
+				pos += sectionVec;
+				disTmp -= sectionLength;
+			}
+			else {
+				vec3 sectionVec(disTmp * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
+					disTmp * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
+					disTmp * sin(1.5 * PI - dip / 180 * PI));
+				pos += sectionVec;
+				return pos;
+			}
+		}
+		else {
+			double sectionLength = 500 - depth;
+			if (sectionLength < disTmp) {
+				vec3 sectionVec(sectionLength * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
+					sectionLength * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
+					sectionLength * sin(1.5 * PI - dip / 180 * PI));
+				pos += sectionVec;
+				disTmp -= sectionLength;
+				pos[2] = INFINITY;
+				return pos;
+			}
+			else {
+				vec3 sectionVec(disTmp * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
+					disTmp * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
+					disTmp * sin(1.5 * PI - dip / 180 * PI));
+				pos += sectionVec;
+				return pos;
+			}
+		}
 
 	}
+
+
 }
