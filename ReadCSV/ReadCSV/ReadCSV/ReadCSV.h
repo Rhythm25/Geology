@@ -19,7 +19,8 @@ public:
 	
 	static vector<vector<string>> ReadFile(string fileName);
 	static vector<double> ConvertToDouble(vector<string>& str);//convert string to double 
-	static void FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector<string>>& allStringPos, vector<vector<string>>& allStringAngle,int seam,
+	static void FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector<string>>& allStringPos, 
+		vector<vector<string>>& allStringAngle,int seam,
 		vector<double>& x,vector<double>& y,vector<double>& z);
 private:
 	static void ReadALine(string oneLine,vector<string> &oneLineString);

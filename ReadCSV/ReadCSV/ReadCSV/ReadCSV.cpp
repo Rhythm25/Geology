@@ -83,15 +83,32 @@ void ReadCSV::FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector
 			}
 		}
 	}
-	//Now we have x,y and distances for seam, we need to convert distance to height z
-	//At first, we convert vector<vector> to map<vector> for allStringAngle
+	
+	//At first, we convert vector<vector> to map<vector<vector>> for allStringAngle and allStringPos
 	map<string, vector<vector<string>>> allMapAngle= ConvertToMap(allStringAngle);
+	map<string, vector<vector<string>>> allMapPos = ConvertToMap(allStringPos);
 
-	//Then we calculate height
+	/*here findstringpos runs for three times, which can be reduced to one time*/
+	vector<string> keyWord = allMapPos["dhid"][0];
+	int eastNum = FindStringPos(keyWord, "east");
+	int northNum= FindStringPos(keyWord, "north");
+	int elNum = FindStringPos(keyWord, "el");
 
+	//Now we have x,y,z and distances for seam on the surface, we need to convert to real position
+	//We calculate pos
 
+	/*here we only need map<string,vector<string>> instead of map<string,vector<vector<string>>>*/
+	for (int i = 0; i < dhidHasSeam.size(); i++) {
+		//vec3 onePos= CalPosForOneDhid
+		double xSurface = atof(allMapPos[dhidHasSeam[i]][0][eastNum].c_str());
+		double ySurface = atof(allMapPos[dhidHasSeam[i]][0][northNum].c_str());
+		double zSurface = atof(allMapPos[dhidHasSeam[i]][0][elNum].c_str());
+		
+		vec3 onePos = CalPosForOneDhid(dhidHasSeam[i], fromDistanceSeam[i], xSurface, ySurface, zSurface, allMapAngle);
 
-	//for (int i = 0; i < dhidHasSeam.size(); i++) cout << dhidHasSeam[i] << endl;
+		x.push_back(onePos[0]); y.push_back(onePos[1]); z.push_back(onePos[2]);
+	}
+	
 }
 
 int ReadCSV::FindStringPos(vector<string>& vecString, string keyWord) {
@@ -187,5 +204,5 @@ vec3 ReadCSV::CalPosForOneDhid(string dhid, double distance, double xSurface, do
 
 	}
 
-
+	return pos;
 }
