@@ -4,28 +4,11 @@
 #include <iostream>
 #include "ReadCSV.h"
 #include "IDWCoef.h"
+#include "ReadSTL.h"
+#include "RBF.h"
 
 void ExpDataWrite(const vector<vector<vec3>> &xyz, string filename)
 {
-    /*const char* filename1 = "1.txt";
-    FILE* fp1 = fopen(filename1, "w");
-    if (fp1 == NULL) 
-    {
-        puts("Fail to open file!");
-        exit(1);
-    }
-
-    fprintf(fp1, "v 0.000000 0.000000 0.000000\n");
-    fprintf(fp1, "v 1.000000 0.000000 0.000000\n");
-    fprintf(fp1, "v 0.000000 1.000000 0.000000\n");
-    fprintf(fp1, "v 1.000000 1.000000 0.000000\n");
-    
-
-    fprintf(fp1, "f 1 2 3\n");
-    fprintf(fp1, "f 2 4 3\n");
-    
-    fclose(fp1);
-    printf("Data saved.\n");*/
     
     FILE* fp = fopen((filename+".txt").c_str(), "w");
     if (fp == NULL)
@@ -61,7 +44,7 @@ void ExpDataWrite(const vector<vector<vec3>> &xyz, string filename)
 
 int main()
 {
-   /* string fileName = "hole_dhd_collar.csv";//stores all information about xy positions
+   string fileName = "hole_dhd_collar.csv";//stores all information about xy positions
     vector<vector<string>> allStringPos=ReadCSV::ReadFile(fileName);
     fileName = "hole_dhd_geology.csv";
     vector<vector<string>> allStringGeo = ReadCSV::ReadFile(fileName);
@@ -69,19 +52,25 @@ int main()
     vector<vector<string>> allStringAngle = ReadCSV::ReadFile(fileName);
 
     vector<double> x, y, z;
-    ReadCSV::FindXYZForSeam(allStringGeo, allStringPos, allStringAngle, 6, x, y, z);*/
-    string filename = "2";
-    vector<vector<vec3>> xyz;
-    xyz.resize(10);
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
-            vec3 xyzOne(j, i, i+j);
-            xyz[i].push_back(xyzOne);
-        }
-    }
+    ReadCSV::FindXYZForSeam(allStringGeo, allStringPos, allStringAngle, 6, x, y, z);
 
+    string filename = "rbf05";
+    vector<vector<vec3>> xyz;
+    
+    //ReadCSV::GetXYZforMesh(x, y, z, 525000, 530500, 4391720, 4407250, 100, 100,1000 ,xyz);
+    RBF* rbf = new RBF();
+    rbf->setMu(0.5);
+    rbf->GetRBFCoef(x, y, z);
+    rbf->GetXYZforMesh(525000, 530500, 4391720, 4407250, 100, 100, xyz);
+
+
+
+    delete rbf;
+   
 
     ExpDataWrite(xyz,filename);
+
+    //ReadSTL::ReadSTLFile("zn6ding.stl");
 
 }
 

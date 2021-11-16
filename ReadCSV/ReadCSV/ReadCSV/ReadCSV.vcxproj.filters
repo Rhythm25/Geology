@@ -24,6 +24,12 @@
     <ClCompile Include="IDWCoef.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ReadSTL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RBF.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReadCSV.h">
@@ -33,6 +39,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="vec3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadSTL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RBF.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

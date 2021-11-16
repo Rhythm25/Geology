@@ -7,6 +7,7 @@
 #include <CString>
 #include <map>
 #include "vec3.h"
+#include "IDWCoef.h"
 #define PI 3.1415926
 
 using namespace std;
@@ -22,6 +23,9 @@ public:
 	static void FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector<string>>& allStringPos, 
 		vector<vector<string>>& allStringAngle,int seam,
 		vector<double>& x,vector<double>& y,vector<double>& z);
+	static void GetXYZforMesh(vector<double>& x, vector<double>& y, vector<double>& z,double xMin,double xMax,double yMin,double yMax,double xUnit,double yUnit
+	,double r, vector<vector<vec3>> &xyz);
+
 private:
 	static void ReadALine(string oneLine,vector<string> &oneLineString);
 	static void ReArrangeLines(vector<string>& keywordString, map<string, vector<string>> &finalStrings);

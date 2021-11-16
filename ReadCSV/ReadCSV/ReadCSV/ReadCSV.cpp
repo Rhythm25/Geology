@@ -105,6 +105,7 @@ void ReadCSV::FindXYZForSeam(vector<vector<string>>& allStringGeo, vector<vector
 		double zSurface = atof(allMapPos[dhidHasSeam[i]][0][elNum].c_str());
 		
 		vec3 onePos = CalPosForOneDhid(dhidHasSeam[i], fromDistanceSeam[i], xSurface, ySurface, zSurface, allMapAngle);
+		//cout << onePos[0] - xSurface <<" "<< onePos[1] - ySurface << endl;
 
 		x.push_back(onePos[0]); y.push_back(onePos[1]); z.push_back(onePos[2]);
 	}
@@ -168,35 +169,42 @@ vec3 ReadCSV::CalPosForOneDhid(string dhid, double distance, double xSurface, do
 		if (i + 1 < mapAngle[dhid].size()) {
 			double sectionLength = atof(mapAngle[dhid][i + 1][depthNum].c_str())-depth;
 			if (sectionLength < disTmp) {
+				//cout << "0" << endl;
 				vec3 sectionVec(sectionLength*cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
 					sectionLength * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
-					sectionLength * sin(1.5 * PI - dip / 180 * PI));
+					sectionLength * sin(dip / 180 * PI));
+				//cout << sectionVec[2] << " " << sectionLength << " " << dip << endl;
 				pos += sectionVec;
 				disTmp -= sectionLength;
 			}
 			else {
+				//cout << "1" << endl;
 				vec3 sectionVec(disTmp * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
 					disTmp * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
-					disTmp * sin(1.5 * PI - dip / 180 * PI));
+					disTmp * sin(dip / 180 * PI));
+				//cout << sectionVec[2] << " " << disTmp << " " << dip << endl;
 				pos += sectionVec;
 				return pos;
 			}
 		}
 		else {
+			//cout << "2" << endl;
 			double sectionLength = 500 - depth;
 			if (sectionLength < disTmp) {
 				vec3 sectionVec(sectionLength * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
 					sectionLength * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
-					sectionLength * sin(1.5 * PI - dip / 180 * PI));
+					sectionLength * sin( dip / 180 * PI));
 				pos += sectionVec;
 				disTmp -= sectionLength;
 				pos[2] = INFINITY;
 				return pos;
 			}
 			else {
+				
 				vec3 sectionVec(disTmp * cos(dip / 180 * PI) * cos(1.5 * PI - azimth / 180 * PI),
 					disTmp * cos(dip / 180 * PI) * sin(1.5 * PI - azimth / 180 * PI),
-					disTmp * sin(1.5 * PI - dip / 180 * PI));
+					disTmp * sin( dip / 180 * PI));
+				//cout << sectionVec[2]<<" "<< disTmp <<" "<< dip << endl;
 				pos += sectionVec;
 				return pos;
 			}
@@ -205,4 +213,26 @@ vec3 ReadCSV::CalPosForOneDhid(string dhid, double distance, double xSurface, do
 	}
 
 	return pos;
+}
+
+void ReadCSV::GetXYZforMesh(vector<double>& x, vector<double>& y, vector<double>& z, double xMin, double xMax, double yMin, double yMax, double xUnit, double yUnit
+	, double r, vector<vector<vec3>>& xyz) {
+	IDWCoef* idwSolver = new IDWCoef();
+	double xPos = xMin, yPos = yMin;
+	while (xPos < xMax) {
+		vector<vec3> oneLinePos;
+		while (yPos < yMax) {			
+			double zPos = idwSolver->GetIDW(x, y, z, xPos, yPos,r);
+
+			
+			 oneLinePos.push_back(vec3(xPos, yPos, zPos));
+			
+
+			yPos += yUnit;
+		}
+		xyz.push_back(oneLinePos);
+		xPos += xUnit;
+		yPos = yMin;
+	}
+	delete idwSolver;
 }
