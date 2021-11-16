@@ -3,6 +3,7 @@
 #include <vector> 
 #include <Eigen/Dense>
 #include "vec3.h"
+#define e 2.71828
 using namespace std;
 class RBF
 {
@@ -27,6 +28,8 @@ public:
 private:
 	void GetMinDis();
 	double GetMinDisForMesh(double x, double y);
+
+	double RadiusBase(double distance,int i);
 
 	inline double Distance(double x1, double y1, double x2, double y2) {
 		return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));

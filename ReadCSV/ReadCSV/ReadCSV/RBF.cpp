@@ -10,7 +10,8 @@ void RBF::GetRBFCoef(vector<double>& x, vector<double>& y, vector<double>& z) {
 
 	for (int i = 0; i < x.size(); i++) {
 		for (int j = 0; j < x.size(); j++) {
-			disMatrix(i, j) = pow(pow(Distance(x[i], y[i], x[j], y[j]), 2) + pow(minDis[j], 2), mu);
+			disMatrix(i, j) = RadiusBase(Distance(x[i], y[i], x[j], y[j]), j);
+			//cout << disMatrix(i, j) << endl;
 		}
 		zMatrix[i] = z[i];
 	}
@@ -42,7 +43,8 @@ void RBF::GetMinDis() {
 double RBF::GetRBF(double x, double y) {
 	double returnZ=0.0;
 	for (int i = 0; i < coef.size(); i++) {
-		returnZ+= pow(pow(Distance(x, y, xSample[i], ySample[i]), 2) + pow(minDis[i], 2), mu)*coef[i];
+		returnZ+= RadiusBase(Distance(x, y, xSample[i], ySample[i]), i)*coef[i];
+		//cout << RadiusBase(Distance(x, y, xSample[i], ySample[i]), i) * coef[i] << endl;
 	}
 	return returnZ;
 }
@@ -82,4 +84,19 @@ void RBF::GetXYZforMesh(double xMin, double xMax, double yMin, double yMax, doub
 		yPos = yMin;
 	}
 
+}
+
+double RBF::RadiusBase(double distance,int i) {
+	switch (1) {
+	case 1:
+		return pow(pow(distance, 2) + pow(minDis[i], 2), mu);
+		break;
+	case 2:
+		cout << pow(distance, 2) << endl;
+		return pow(e,-pow(distance, 2)) ;
+		break;
+	default:
+		break;
+	}
+	
 }

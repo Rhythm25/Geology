@@ -54,12 +54,12 @@ int main()
     vector<double> x, y, z;
     ReadCSV::FindXYZForSeam(allStringGeo, allStringPos, allStringAngle, 6, x, y, z);
 
-    string filename = "rbf05";
+    string filename = "rbf4";
     vector<vector<vec3>> xyz;
     
     //ReadCSV::GetXYZforMesh(x, y, z, 525000, 530500, 4391720, 4407250, 100, 100,1000 ,xyz);
     RBF* rbf = new RBF();
-    rbf->setMu(0.5);
+    rbf->setMu(-0.5);
     rbf->GetRBFCoef(x, y, z);
     rbf->GetXYZforMesh(525000, 530500, 4391720, 4407250, 100, 100, xyz);
 
